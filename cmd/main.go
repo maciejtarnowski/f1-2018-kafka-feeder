@@ -1,29 +1,26 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
-	"encoding/json"
-	"fmt"
 	"github.com/maciejtarnowski/f1-2018-kafka-feeder"
+	"github.com/maciejtarnowski/f1-2018-kafka-feeder/packet_handler"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"log"
 	"net"
 	"os"
 )
 
+const LISTEN_ADDR = ":2018"
+
 func main() {
-	// listen to incoming udp packets
-	server, err := net.ListenPacket("udp", ":2018")
+	server, err := net.ListenPacket("udp", LISTEN_ADDR)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("UDP listening on %s", LISTEN_ADDR)
 	defer server.Close()
 
 	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <broker> <topic>\n",
-			os.Args[0])
-		os.Exit(1)
+		log.Fatal("Invalid options, usage: <broker> <topic>")
 	}
 
 	broker := os.Args[1]
@@ -32,11 +29,11 @@ func main() {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": broker})
 
 	if err != nil {
-		fmt.Printf("Failed to create producer: %s\n", err)
+		log.Printf("Failed to create producer: %s\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Created Producer %v\n", p)
+	log.Printf("Created Producer %v\n", p)
 
 	for {
 		buf := make([]byte, 2048)
@@ -49,58 +46,15 @@ func main() {
 }
 
 func handleData(buf []byte, p *kafka.Producer, topic string) {
-	packet := f1_2018_kafka_feeder.PacketCarTelemetryData{}
+	jsonString, skip := packet_handler.Dispatch(buf)
 
-	var packetId uint8
-	err := binary.Read(bytes.NewBuffer(buf[3:4]), binary.LittleEndian, &packetId)
-	if err != nil || packetId != 6 {
+	if skip {
 		return
-	}
-
-	err = binary.Read(bytes.NewBuffer(buf[:]), binary.LittleEndian, &packet)
-
-	if err != nil {
-		panic(err)
-	}
-
-	playerCarData := packet.Telemetry[packet.Header.PlayerCarIndex]
-
-	jsonPacket := f1_2018_kafka_feeder.CarTelemetryJson{
-		Speed: int(playerCarData.Speed),
-		Throttle: int(playerCarData.Throttle),
-		Steer: int(playerCarData.Steer),
-		Brake: int(playerCarData.Brake),
-		Gear: int(playerCarData.Gear),
-		Drs: playerCarData.DRS == 1,
-	}
-
-	jsonString, err := json.Marshal(&jsonPacket)
-
-	if err != nil {
-		log.Println("Failed to encode JSON")
 	}
 
 	doneChan := make(chan bool)
 
-	go func() {
-		defer close(doneChan)
-		for e := range p.Events() {
-			switch ev := e.(type) {
-			case *kafka.Message:
-				m := ev
-				if m.TopicPartition.Error != nil {
-					fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
-				}
-				return
-
-			default:
-				fmt.Printf("Ignored event: %s\n", ev)
-			}
-		}
-	}()
-
-	p.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: jsonString}
+	f1_2018_kafka_feeder.PublishToKafka(p, topic, jsonString, doneChan)
 
 	_ = <-doneChan
-	//fmt.Println(packet.Telemetry[packet.Header.PlayerCarIndex].Speed)
 }

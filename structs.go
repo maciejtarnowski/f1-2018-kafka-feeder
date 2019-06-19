@@ -76,3 +76,97 @@ type PacketCarTelemetryData struct {
 	ButtonStatus uint32
 }
 
+/*
+struct CarMotionData
+{
+	float         m_worldPositionX;           // World space X position
+	float         m_worldPositionY;           // World space Y position
+	float         m_worldPositionZ;           // World space Z position
+	float         m_worldVelocityX;           // Velocity in world space X
+	float         m_worldVelocityY;           // Velocity in world space Y
+	float         m_worldVelocityZ;           // Velocity in world space Z
+	int16         m_worldForwardDirX;         // World space forward X direction (normalised)
+	int16         m_worldForwardDirY;         // World space forward Y direction (normalised)
+	int16         m_worldForwardDirZ;         // World space forward Z direction (normalised)
+	int16         m_worldRightDirX;           // World space right X direction (normalised)
+	int16         m_worldRightDirY;           // World space right Y direction (normalised)
+	int16         m_worldRightDirZ;           // World space right Z direction (normalised)
+	float         m_gForceLateral;            // Lateral G-Force component
+	float         m_gForceLongitudinal;       // Longitudinal G-Force component
+	float         m_gForceVertical;           // Vertical G-Force component
+	float         m_yaw;                      // Yaw angle in radians
+	float         m_pitch;                    // Pitch angle in radians
+	float         m_roll;                     // Roll angle in radians
+};
+ */
+type CarMotionData struct {
+	WorldPositionX float32
+	WorldPositionY float32
+	WorldPositionZ float32
+
+	WorldVelocityX float32
+	WorldVelocityY float32
+	WorldVelocityZ float32
+
+	WorldForwardDirX int16
+	WorldForwardDirY int16
+	WorldForwardDirZ int16
+
+	WorldRightDirX int16
+	WorldRightDirY int16
+	WorldRightDirZ int16
+
+	GForceLateral float32
+	GForceLongitudinal float32
+	GForceVertical float32
+
+	Yaw float32
+	Pitch float32
+	Roll float32
+}
+
+/*
+struct PacketMotionData
+{
+	PacketHeader    m_header;               // Header
+
+	CarMotionData   m_carMotionData[20];    // Data for all cars on track
+
+	// Extra player car ONLY data
+	float         m_suspensionPosition[4];       // Note: All wheel arrays have the following order:
+	float         m_suspensionVelocity[4];       // RL, RR, FL, FR
+	float         m_suspensionAcceleration[4];   // RL, RR, FL, FR
+	float         m_wheelSpeed[4];               // Speed of each wheel
+	float         m_wheelSlip[4];                // Slip ratio for each wheel
+	float         m_localVelocityX;              // Velocity in local space
+	float         m_localVelocityY;              // Velocity in local space
+	float         m_localVelocityZ;              // Velocity in local space
+	float         m_angularVelocityX;            // Angular velocity x-component
+	float         m_angularVelocityY;            // Angular velocity y-component
+	float         m_angularVelocityZ;            // Angular velocity z-component
+	float         m_angularAccelerationX;        // Angular velocity x-component
+	float         m_angularAccelerationY;        // Angular velocity y-component
+	float         m_angularAccelerationZ;        // Angular velocity z-component
+	float         m_frontWheelsAngle;            // Current front wheels angle in radians
+};
+ */
+type PacketMotionData struct {
+	Header PacketHeader
+	MotionData [20]CarMotionData
+
+	SuspensionPosition [4]float32
+	SuspensionVelocity [4]float32
+	SuspensionAcceleration [4]float32
+	WheelSpeed [4]float32
+	WheelSlip [4]float32
+	LocalVelocityX float32
+	LocalVelocityY float32
+	LocalVelocityZ float32
+	AngularVelocityX float32
+	AngularVelocityY float32
+	AngularVelocityZ float32
+	AngularAccelerationX float32
+	AngularAccelerationY float32
+	AngularAccelerationZ float32
+	FrontWheelsAngle float32
+}
