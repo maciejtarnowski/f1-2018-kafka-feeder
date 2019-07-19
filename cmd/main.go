@@ -20,11 +20,10 @@ func main() {
 	defer server.Close()
 
 	if len(os.Args) != 3 {
-		log.Fatal("Invalid options, usage: <broker> <topic>")
+		log.Fatal("Invalid options, usage: <broker>")
 	}
 
 	broker := os.Args[1]
-	topic := os.Args[2]
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": broker})
 
@@ -41,12 +40,12 @@ func main() {
 		if err != nil {
 			continue
 		}
-		go handleData(buf[:n], p, topic)
+		go handleData(buf[:n], p)
 	}
 }
 
-func handleData(buf []byte, p *kafka.Producer, topic string) {
-	jsonString, skip := packet_handler.Dispatch(buf)
+func handleData(buf []byte, p *kafka.Producer) {
+	jsonString, topic, skip := packet_handler.Dispatch(buf)
 
 	if skip {
 		return

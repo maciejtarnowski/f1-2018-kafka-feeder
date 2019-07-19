@@ -18,3 +18,10 @@ type CarMotionJson struct {
 	PosY      float32 `json:"pos_y"`
 	PosZ      float32 `json:"pos_z"`
 }
+
+type LapDataJson struct {
+	TimeStamp        int64   `json:"timestamp"`
+	EventId          int     `json:"event_id"`
+	CurrentLapNumber int     `json:"current_lap_number"`
+	LastLapTime      float64 `json:"last_lap_time"`
+}

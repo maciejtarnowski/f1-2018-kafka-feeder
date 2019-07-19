@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-func CarMotionHandler(message []byte) (jsonPayload []byte, skip bool) {
+func CarMotionHandler(message []byte) (jsonPayload []byte, topic string, skip bool) {
 	packet := f1_2018_kafka_feeder.PacketMotionData{}
 
 	err := binary.Read(bytes.NewBuffer(message[:]), binary.LittleEndian, &packet)
 
 	if err != nil {
-		return []byte(""), true
+		return []byte(""), "", true
 	}
 
 	playerCarData := packet.MotionData[packet.Header.PlayerCarIndex]
@@ -30,8 +30,8 @@ func CarMotionHandler(message []byte) (jsonPayload []byte, skip bool) {
 	jsonString, err := json.Marshal(&jsonPacket)
 
 	if err != nil {
-		return []byte(""), true
+		return []byte(""), "", true
 	}
 
-	return jsonString, false
+	return jsonString, "raw_car_motion_data", false
 }
