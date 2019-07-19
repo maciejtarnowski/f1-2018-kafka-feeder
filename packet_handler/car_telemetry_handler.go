@@ -20,6 +20,7 @@ func CarTelemetryHandler(message []byte) (jsonPayload []byte, topic string, skip
 	playerCarData := packet.Telemetry[packet.Header.PlayerCarIndex]
 
 	jsonPacket := f1_2018_kafka_feeder.CarTelemetryJson{
+		PlayerId: int(packet.Header.PlayerCarIndex),
 		TimeStamp: time.Now().UnixNano() / int64(time.Millisecond),
 		EventId: 6,
 		Speed: int(playerCarData.Speed),

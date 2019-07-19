@@ -1,6 +1,7 @@
 package f1_2018_kafka_feeder
 
 type CarTelemetryJson struct {
+	PlayerId int  `json:"player_id"`
 	TimeStamp int64 `json:"timestamp"`
 	EventId  int  `json:"event_id"`
 	Speed    int  `json:"speed"`
@@ -12,6 +13,7 @@ type CarTelemetryJson struct {
 }
 
 type CarMotionJson struct {
+	PlayerId  int     `json:"player_id"`
 	TimeStamp int64   `json:"timestamp"`
 	EventId   int     `json:"event_id"`
 	PosX      float32 `json:"pos_x"`
@@ -20,6 +22,7 @@ type CarMotionJson struct {
 }
 
 type LapDataJson struct {
+	PlayerId         int     `json:"player_id"`
 	TimeStamp        int64   `json:"timestamp"`
 	EventId          int     `json:"event_id"`
 	CurrentLapNumber int     `json:"current_lap_number"`

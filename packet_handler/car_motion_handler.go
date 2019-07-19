@@ -20,6 +20,7 @@ func CarMotionHandler(message []byte) (jsonPayload []byte, topic string, skip bo
 	playerCarData := packet.MotionData[packet.Header.PlayerCarIndex]
 
 	jsonPacket := f1_2018_kafka_feeder.CarMotionJson{
+		PlayerId: int(packet.Header.PlayerCarIndex),
 		TimeStamp: time.Now().UnixNano() / int64(time.Millisecond),
 		EventId: 0,
 		PosX: playerCarData.WorldPositionX,

@@ -20,6 +20,7 @@ func LapDataHandler(message []byte) (jsonPayload []byte, topic string, skip bool
 	playerLapData := packet.LapData[packet.Header.PlayerCarIndex]
 
 	jsonPacket := f1_2018_kafka_feeder.LapDataJson{
+		PlayerId: int(packet.Header.PlayerCarIndex),
 		TimeStamp: time.Now().UnixNano() / int64(time.Millisecond),
 		EventId: 2,
 		CurrentLapNumber: int(playerLapData.CurrentLapNum),
