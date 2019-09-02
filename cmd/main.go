@@ -19,7 +19,7 @@ func main() {
 	log.Printf("UDP listening on %s", LISTEN_ADDR)
 	defer server.Close()
 
-	if len(os.Args) != 3 {
+	if len(os.Args) != 2 {
 		log.Fatal("Invalid options, usage: <broker>")
 	}
 
